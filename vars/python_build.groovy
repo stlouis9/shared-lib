@@ -13,6 +13,7 @@ def call(dockerRepoName, portNum, service) {
                         sh '. ./.venv/bin/activate'
                         sh 'pip install -r requirements.txt --break-system-packages'
                         sh 'pip install --upgrade flask --break-system-packages'
+                        sh 'pip install safety --break-system-packages'
                     }
                 }
             }
@@ -26,8 +27,12 @@ def call(dockerRepoName, portNum, service) {
             stage('Security Check') {
                 steps {
                     dir(service) {
-                        //add snyk or safety?
-                        sh 'echo hello'
+                        sh script: '''
+                        . ./.venv/bin/activate
+                        export PATH=$PATH:~/.local/bin
+                        safety check -r requirements.txt --full-report > safety_report.txt
+                        ''', returnStdout: false
+                        archiveArtifacts artifacts: 'safety_report.txt', onlyIfSuccessful: false
                     }
                 }
             }
