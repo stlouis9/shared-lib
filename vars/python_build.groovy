@@ -23,6 +23,7 @@ def call(dockerRepoName, imageName, portNum) {
         stage('Security Check'){
             steps {
               //add snyk or safety?
+              sh 'echo hello'
             }
         }
         stage('Package') {
