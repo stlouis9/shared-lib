@@ -1,4 +1,4 @@
-def call(dockerRepoName, imageName, portNum, service) {
+def call(dockerRepoName, portNum, service) {
     pipeline {
         agent any
         parameters {
@@ -39,8 +39,8 @@ def call(dockerRepoName, imageName, portNum, service) {
                     dir(service) {
                         withCredentials([string(credentialsId: 'DockerHub', variable: 'TOKEN')]) {
                             sh "docker login -u 'stlouis9' -p '$TOKEN' docker.io"
-                            sh "docker build -t ${dockerRepoName}:latest --tag stlouis9/${dockerRepoName}:${imageName} ."
-                            sh "docker push stlouis9/${dockerRepoName}:${imageName}"
+                            sh "docker build -t ${dockerRepoName}:latest ."
+                            sh "docker push stlouis9/${dockerRepoName}:latest"
                         }
                     }
                 }
@@ -50,9 +50,10 @@ def call(dockerRepoName, imageName, portNum, service) {
                     expression { params.DEPLOY }
                 }
                 steps {
-                    dir(service) {
-                        sh "docker stop ${dockerRepoName} || true && docker rm ${dockerRepoName} || true"
-                        sh "docker run -d -p ${portNum}:${portNum} --name ${dockerRepoName} ${dockerRepoName}:latest"
+                    sshagent(['Robert3855VM']) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no azureuser@kafka3855.westus3.cloudapp.azure.com 'cd ~/3855Microservices/deployment && docker compose pull storage receiver processing && docker compose up -d'
+                        """
                     }
                 }
             }
