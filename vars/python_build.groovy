@@ -39,7 +39,7 @@ def call(dockerRepoName, portNum, service) {
                     dir(service) {
                         withCredentials([string(credentialsId: 'DockerHub', variable: 'TOKEN')]) {
                             sh "docker login -u 'stlouis9' -p '$TOKEN' docker.io"
-                            sh "docker build -t ${dockerRepoName}:latest ."
+                            sh "docker build -t stlouis9/${dockerRepoName}:latest ."
                             sh "docker push stlouis9/${dockerRepoName}:latest"
                         }
                     }
