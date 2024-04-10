@@ -7,7 +7,6 @@ def call(dockerRepoName, imageName, portNum, service) {
         stages {
             stage('Build') {
                 steps {
-                    cleanWs()
                     dir(service) {
                         sh 'if [ -d ".venv" ]; then rm -Rf .venv; fi'
                         sh 'python3 -m venv .venv'
