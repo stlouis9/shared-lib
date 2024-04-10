@@ -18,14 +18,14 @@ def call(dockerRepoName, imageName, portNum, service) {
             }
             stage('Python Lint') {
                 steps {
-                    dir(service){
+                    dir(service) {
                         sh 'pylint --fail-under 5 *.py'
                     }
                 }
             }
             stage('Security Check') {
                 steps {
-                    dir(service){
+                    dir(service) {
                         //add snyk or safety?
                         sh 'echo hello'
                     }
@@ -33,7 +33,7 @@ def call(dockerRepoName, imageName, portNum, service) {
             }
             stage('Package') {
                 when {
-                    expression { env.GIT_BRANCH == 'origin/main' }
+                    expression { env.GIT_BRANCH == 'origin/master' }
                 }
                 steps {
                     dir(service) {
@@ -50,7 +50,7 @@ def call(dockerRepoName, imageName, portNum, service) {
                     expression { params.DEPLOY }
                 }
                 steps {
-                    dir(service){
+                    dir(service) {
                         sh "docker stop ${dockerRepoName} || true && docker rm ${dockerRepoName} || true"
                         sh "docker run -d -p ${portNum}:${portNum} --name ${dockerRepoName} ${dockerRepoName}:latest"
                     }
